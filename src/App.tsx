@@ -38,7 +38,6 @@ function formatDate(dateString: string) {
 function App() {
   const [posts, setPosts] = useState<GratitudePost[]>([]);
   const [message, setMessage] = useState('');
-  const [hasLoaded, setHasLoaded] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Fetch notes from Supabase on mount
@@ -54,7 +53,6 @@ function App() {
           color: note.color || getRandomColor(),
         })));
       }
-      setHasLoaded(true);
     };
     fetchNotes();
   }, []);
