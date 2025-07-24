@@ -29,9 +29,7 @@ function formatDate(dateString: string) {
   return date.toLocaleString(undefined, {
     year: 'numeric',
     month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: 'numeric'
   });
 }
 
@@ -163,7 +161,7 @@ function App() {
                 <span className="gratitude-date">{formatDate(post.created_at)}</span>
                 <button className="note-delete" title="Delete" onClick={() => handleDelete(post.id)}>🗑️</button>
                 <button className="note-share" title="Share" onClick={() => handleShare(post.id, post.message)}>
-                  {copiedId === post.id ? 'Copied!' : '🔗'}
+                  {copiedId === post.id ? 'Copied' : '🔗'}
                 </button>
               </motion.div>
             ))}
