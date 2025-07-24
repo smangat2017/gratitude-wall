@@ -95,15 +95,15 @@ html, body, #root, .wall-container {
 
 .gratitude-input {
   resize: none;
-  padding: 1.5rem 1.5rem;
+  padding: 3rem 2rem;
   border-radius: 12px;
   border: 1px solid #e0e0e0;
   font-size: 1.2rem;
   background: #f9f9f9;
   transition: border 0.2s;
   font-family: 'Nunito', Arial, sans-serif;
-  min-height: 150px;
-  width: 100%;
+  width: 40vh;
+  line-height: 1.5;
   box-sizing: border-box;
   margin-bottom: 0.5rem;
 }
@@ -297,6 +297,24 @@ html, body, #root, .wall-container {
   color: #61dafb;
 }
 
+.note-highlight {
+  animation: noteHighlightFade 1.2s ease-out;
+  box-shadow: 0 0 0 4px #ffe4e4, 0 0 16px 4px #ffe4e4;
+  z-index: 3;
+}
+
+@keyframes noteHighlightFade {
+  0% {
+    box-shadow: 0 0 0 8px #ffe4e4, 0 0 32px 8px #ffe4e4;
+  }
+  60% {
+    box-shadow: 0 0 0 4px #ffe4e4, 0 0 16px 4px #ffe4e4;
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 700px) {
   .bulletin-board {
     gap: 1.2rem 0.5rem;
@@ -316,8 +334,8 @@ html, body, #root, .wall-container {
     font-size: 2rem;
   }
   .gratitude-input {
-    padding: 1.5rem 1rem;
+    padding: 2.5rem 1rem;
     font-size: 1.05rem;
-    min-height: 80px;
+    min-height: 120px;
   }
 }

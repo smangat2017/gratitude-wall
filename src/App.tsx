@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from './supabaseClient';
@@ -39,6 +39,8 @@ function App() {
   const [posts, setPosts] = useState<GratitudePost[]>([]);
   const [message, setMessage] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [justAddedId, setJustAddedId] = useState<string | null>(null);
+  const highlightTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch notes from Supabase on mount
   useEffect(() => {
@@ -55,6 +57,33 @@ function App() {
       }
     };
     fetchNotes();
+
+    // Real-time subscription
+    const channel = supabase
+      .channel('gratitude-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'gratitude_notes' },
+        (payload: any) => {
+          if (payload.eventType === 'INSERT') {
+            setPosts(prev => [
+              { ...payload.new, color: payload.new.color || getRandomColor() },
+              ...prev.filter(p => p.id !== payload.new.id)
+            ]);
+            setJustAddedId(payload.new.id);
+            if (highlightTimeout.current) clearTimeout(highlightTimeout.current);
+            highlightTimeout.current = setTimeout(() => setJustAddedId(null), 1200);
+          } else if (payload.eventType === 'DELETE') {
+            setPosts(prev => prev.filter(p => p.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      if (highlightTimeout.current) clearTimeout(highlightTimeout.current);
+    };
   }, []);
 
   // Add note to Supabase
@@ -105,7 +134,7 @@ function App() {
             className="gratitude-input"
             value={message}
             onChange={e => setMessage(e.target.value)}
-            placeholder="Share your love..."
+            placeholder="What's one thing you're grateful for on your Mana Journey?"
             rows={3}
             maxLength={240}
           />
@@ -119,13 +148,13 @@ function App() {
           <AnimatePresence>
             {posts.map((post) => (
               <motion.div
-                className="gratitude-post bulletin-note"
+                className={`gratitude-post bulletin-note${justAddedId === post.id ? ' note-highlight' : ''}`}
                 key={post.id}
                 layout
                 initial={{ opacity: 0, scale: 0.95, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -30 }}
-                transition={{ duration: 0.35, type: 'spring', stiffness: 120 }}
+                exit={{ opacity: 0, scale: 0.85, y: 60 }}
+                transition={{ duration: 0.6, type: 'tween', ease: 'easeInOut' }}
                 style={{
                   background: post.color,
                 }}
